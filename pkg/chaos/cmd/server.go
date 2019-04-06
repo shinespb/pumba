@@ -3,20 +3,23 @@ package cmd
 import (
 	"context"
 	"fmt"
-
-	"github.com/gin-gonic/gin"
-	"github.com/urfave/cli"
+	"net/http"
+	"time"
 
 	"github.com/alexei-led/pumba/pkg/chaos/docker/controller"
+	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
+	"github.com/urfave/cli"
 )
 
 type serverContext struct {
 	context context.Context
+	version string
 }
 
 // NewServerCommand initialize CLI server command and bind it to the serverContext
-func NewServerCommand(ctx context.Context) *cli.Command {
-	cmdContext := &serverContext{context: ctx}
+func NewServerCommand(ctx context.Context, version string) *cli.Command {
+	cmdContext := &serverContext{context: ctx, version: version}
 	return &cli.Command{
 		Name: "server",
 		Flags: []cli.Flag{
@@ -47,14 +50,48 @@ func (cmd *serverContext) run(c *cli.Context) error {
 	// Recovery middleware recovers from any panics and writes a 500 if there was one
 	r.Use(gin.Recovery())
 
+	// handle chaos commands
 	dockerChaos := controller.NewDockerChaosController(cmd.context)
-
 	r.POST("/docker/kill", dockerChaos.Kill)
 	r.POST("/docker/pause", dockerChaos.Pause)
 	r.POST("/docker/stop", dockerChaos.Stop)
 	r.POST("/docker/remove", dockerChaos.Remove)
 
-	// By default it serves on :8080 unless a
-	// PORT environment variable was defined.
-	return r.Run(fmt.Sprintf(":%v", port))
+	// handle helper commands
+	r.GET("/version", cmd.getVersion)
+
+	// create HTTP server
+	srv := &http.Server{
+		Addr:    fmt.Sprintf(":%v", port),
+		Handler: r,
+	}
+
+	// run server in goroutine
+	go func() {
+		// service connections
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.WithError(err).Fatal("Failed to start server")
+		}
+	}()
+
+	// wait for server to stop (with Ctrl+C)
+	select {
+	case <-cmd.context.Done():
+		log.Debug("Gracefully shutting down server ...")
+	}
+
+	// gracefully shutdown HTTP server
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(ctx); err != nil {
+		log.WithError(err).Error("Server shutdown")
+		return err
+	}
+	log.Debug("Server shutdown completed")
+	return nil
+}
+
+func (cmd *serverContext) getVersion(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"version": cmd.version})
+	return
 }

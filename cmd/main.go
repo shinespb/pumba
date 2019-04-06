@@ -280,7 +280,7 @@ func tlsConfig(c *cli.Context) (*tls.Config, error) {
 
 func initializeCLICommands() []cli.Command {
 	return []cli.Command{
-		*headlessCmd.NewServerCommand(topContext),
+		*headlessCmd.NewServerCommand(topContext, HumanVersion),
 		*cmd.NewKillCLICommand(topContext),
 		*cmd.NewStopCLICommand(topContext),
 		*cmd.NewPauseCLICommand(topContext),
