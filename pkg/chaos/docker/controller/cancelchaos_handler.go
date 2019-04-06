@@ -28,6 +28,8 @@ func (cmd *serverContext) CancelChaos(c *gin.Context) {
 		return
 	}
 	cancel()
+	//remove canceled command from jobs
+	jobs.Delete(job)
 
 	c.JSON(http.StatusOK, gin.H{"status": "canceled chaos command", "job": job})
 	return
