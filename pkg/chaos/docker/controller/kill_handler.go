@@ -1,7 +1,10 @@
 package controller
 
 import (
+	"context"
+	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/alexei-led/pumba/pkg/chaos"
 	"github.com/alexei-led/pumba/pkg/chaos/docker"
@@ -24,8 +27,12 @@ func (cmd *serverContext) Kill(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	// store chaos job cancel() in jobs map
+	context, cancel := context.WithCancel(cmd.context)
+	job := fmt.Sprintf("kill-%v", time.Now().UnixNano())
+	jobs.Store(job, cancel)
 	// run kill command in goroutine
-	go chaos.RunChaosCommand(cmd.context, killCommand, msg.Interval, msg.Random)
-	c.JSON(http.StatusAccepted, gin.H{"status": "running kill command ..."})
+	go chaos.RunChaosCommand(context, killCommand, msg.Interval, msg.Random)
+	c.JSON(http.StatusAccepted, gin.H{"status": "running kill command", "job": job})
 	return
 }

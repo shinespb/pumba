@@ -52,6 +52,7 @@ func (cmd *serverContext) run(c *cli.Context) error {
 
 	// handle chaos commands
 	dockerChaos := controller.NewDockerChaosController(cmd.context)
+	r.DELETE("/docker/chaos", dockerChaos.CancelChaos)
 	r.POST("/docker/kill", dockerChaos.Kill)
 	r.POST("/docker/pause", dockerChaos.Pause)
 	r.POST("/docker/stop", dockerChaos.Stop)
