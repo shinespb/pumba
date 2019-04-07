@@ -15,8 +15,7 @@ type serverContext struct {
 }
 
 // DockerChaos controller interface
-type DockerChaos interface {
-	CancelChaos(c *gin.Context)
+type DockerChaosController interface {
 	Kill(c *gin.Context)
 	Pause(c *gin.Context)
 	Remove(c *gin.Context)
@@ -24,6 +23,6 @@ type DockerChaos interface {
 }
 
 // NewDockerChaosController dockerContext
-func NewDockerChaosController(ctx context.Context) DockerChaos {
+func NewDockerChaosController(ctx context.Context) DockerChaosController {
 	return &serverContext{context: ctx}
 }

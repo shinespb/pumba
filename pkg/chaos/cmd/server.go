@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	ctrl "github.com/alexei-led/pumba/pkg/chaos/controller"
 	"github.com/alexei-led/pumba/pkg/chaos/docker/controller"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
@@ -49,17 +50,20 @@ func (cmd *serverContext) run(c *cli.Context) error {
 	r.Use(gin.Logger())
 	// Recovery middleware recovers from any panics and writes a 500 if there was one
 	r.Use(gin.Recovery())
+	v1 := r.Group("/v1")
 
 	// handle chaos commands
-	dockerChaos := controller.NewDockerChaosController(cmd.context)
-	r.DELETE("/docker/chaos", dockerChaos.CancelChaos)
-	r.POST("/docker/kill", dockerChaos.Kill)
-	r.POST("/docker/pause", dockerChaos.Pause)
-	r.POST("/docker/stop", dockerChaos.Stop)
-	r.POST("/docker/remove", dockerChaos.Remove)
+	dockerController := controller.NewDockerChaosController(cmd.context)
+	v1.POST("/docker/kill", dockerController.Kill)
+	v1.POST("/docker/pause", dockerController.Pause)
+	v1.POST("/docker/stop", dockerController.Stop)
+	v1.POST("/docker/remove", dockerController.Remove)
 
+	// cancel chaos command
+	chaosController := ctrl.NewChaosController(cmd.version)
+	v1.DELETE("/chaos", chaosController.Cancel)
 	// handle helper commands
-	r.GET("/version", cmd.getVersion)
+	v1.GET("/version", chaosController.GetVersion)
 
 	// create HTTP server
 	srv := &http.Server{
@@ -90,9 +94,4 @@ func (cmd *serverContext) run(c *cli.Context) error {
 	}
 	log.Debug("Server shutdown completed")
 	return nil
-}
-
-func (cmd *serverContext) getVersion(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{"version": cmd.version})
-	return
 }

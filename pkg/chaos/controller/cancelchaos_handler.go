@@ -7,8 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// CancelChaos handler
-func (cmd *serverContext) CancelChaos(c *gin.Context) {
+// Cancel handler
+func (cc *chaosController) Cancel(c *gin.Context) {
 	// get chaos job
 	job := c.Query("job")
 	if job == "" {
@@ -16,7 +16,7 @@ func (cmd *serverContext) CancelChaos(c *gin.Context) {
 		return
 	}
 	// get cancel function
-	fn, ok := jobs.Load(job)
+	fn, ok := ChaosJobs.Load(job)
 	if !ok {
 		c.JSON(http.StatusNotFound, gin.H{"error": "cannot find chaos job with specified id"})
 		return
@@ -29,7 +29,7 @@ func (cmd *serverContext) CancelChaos(c *gin.Context) {
 	}
 	cancel()
 	//remove canceled command from jobs
-	jobs.Delete(job)
+	ChaosJobs.Delete(job)
 
 	c.JSON(http.StatusOK, gin.H{"status": "canceled chaos command", "job": job})
 	return

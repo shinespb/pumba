@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/alexei-led/pumba/pkg/chaos"
+	ctrl "github.com/alexei-led/pumba/pkg/chaos/controller"
 	"github.com/alexei-led/pumba/pkg/chaos/docker"
 
 	"github.com/gin-gonic/gin"
@@ -30,7 +31,7 @@ func (cmd *serverContext) Kill(c *gin.Context) {
 	// store chaos job cancel() in jobs map
 	context, cancel := context.WithCancel(cmd.context)
 	job := fmt.Sprintf("kill-%v", time.Now().UnixNano())
-	jobs.Store(job, cancel)
+	ctrl.ChaosJobs.Store(job, cancel)
 	// run kill command in goroutine
 	go chaos.RunChaosCommand(context, killCommand, msg.Interval, msg.Random)
 	c.JSON(http.StatusAccepted, gin.H{"status": "running kill command", "job": job})
