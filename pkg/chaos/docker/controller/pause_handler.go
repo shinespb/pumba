@@ -1,9 +1,13 @@
 package controller
 
 import (
+	"context"
+	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/alexei-led/pumba/pkg/chaos"
+	ctrl "github.com/alexei-led/pumba/pkg/chaos/controller"
 	"github.com/alexei-led/pumba/pkg/chaos/docker"
 
 	"github.com/gin-gonic/gin"
@@ -24,8 +28,12 @@ func (cmd *serverContext) Pause(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	// store chaos job cancel() in jobs map
+	context, cancel := context.WithCancel(cmd.context)
+	job := fmt.Sprintf("pause-%v", time.Now().UnixNano())
+	ctrl.ChaosJobs.Store(job, cancel)
 	// run pause command in goroutine
-	go chaos.RunChaosCommand(cmd.context, pauseCommand, msg.Interval, msg.Random)
+	go chaos.RunChaosCommand(context, pauseCommand, msg.Interval, msg.Random)
 	c.JSON(http.StatusAccepted, gin.H{"status": "running pause command ..."})
 	return
 }

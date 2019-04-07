@@ -1,14 +1,17 @@
 package controller
 
 import (
+	"context"
+	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/alexei-led/pumba/pkg/chaos"
+	ctrl "github.com/alexei-led/pumba/pkg/chaos/controller"
 	"github.com/alexei-led/pumba/pkg/chaos/docker"
 
 	"github.com/gin-gonic/gin"
 )
-
 
 // Remove handler
 func (cmd *serverContext) Remove(c *gin.Context) {
@@ -25,8 +28,12 @@ func (cmd *serverContext) Remove(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	// store chaos job cancel() in jobs map
+	context, cancel := context.WithCancel(cmd.context)
+	job := fmt.Sprintf("remove-%v", time.Now().UnixNano())
+	ctrl.ChaosJobs.Store(job, cancel)
 	// run remove command in goroutine
-	go chaos.RunChaosCommand(cmd.context, removeCommand, msg.Interval, msg.Random)
+	go chaos.RunChaosCommand(context, removeCommand, msg.Interval, msg.Random)
 	c.JSON(http.StatusAccepted, gin.H{"status": "running remove command..."})
 	return
 }
