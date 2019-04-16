@@ -8,7 +8,7 @@
 
 ## Logo
 
-![pumba](docs/img/pumba_logo.png)
+<img src="docs/img/pumba_logo_2.png" width=200/>
 
 ## Demo
 
