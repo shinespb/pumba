@@ -10,9 +10,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/alexei-led/pumba/pkg/chaos"
-	"github.com/alexei-led/pumba/pkg/container"
-	"github.com/alexei-led/pumba/pkg/util"
+	"github.com/shinespb/pumba/pkg/chaos"
+	"github.com/shinespb/pumba/pkg/container"
+	"github.com/shinespb/pumba/pkg/util"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -24,6 +24,7 @@ type LossStateCommand struct {
 	pattern  string
 	iface    string
 	ips      []*net.IPNet
+	port     uint16
 	duration time.Duration
 	p13      float64
 	p31      float64
@@ -42,6 +43,7 @@ func NewLossStateCommand(client container.Client,
 	pattern string, // re2 regex pattern
 	iface string, // network interface
 	ipsList []string, // list of target ips
+	port    uint16,
 	durationStr string, // chaos duration
 	intervalStr string, // repeatable chaos interval
 	p13 float64, // probability to go from state (1) to state (3)
@@ -127,6 +129,7 @@ func NewLossStateCommand(client container.Client,
 		pattern:  pattern,
 		iface:    iface,
 		ips:      ips,
+		port:     port,
 		duration: duration,
 		p13:      p13,
 		p31:      p31,
@@ -186,7 +189,7 @@ func (n *LossStateCommand) Run(ctx context.Context, random bool) error {
 		wg.Add(1)
 		go func(i int, c container.Container) {
 			defer wg.Done()
-			errors[i] = runNetem(netemCtx, n.client, c, n.iface, netemCmd, n.ips, n.duration, n.image, n.pull, n.dryRun)
+			errors[i] = runNetem(netemCtx, n.client, c, n.iface, netemCmd, n.ips, n.port, n.duration, n.image, n.pull, n.dryRun)
 			if errors[i] != nil {
 				log.WithError(errors[i]).Error("failed to set packet loss for container")
 			}

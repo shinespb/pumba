@@ -6,8 +6,8 @@ import (
 
 	"github.com/urfave/cli"
 
-	"github.com/alexei-led/pumba/pkg/chaos"
-	"github.com/alexei-led/pumba/pkg/chaos/docker"
+	"github.com/shinespb/pumba/pkg/chaos"
+	"github.com/shinespb/pumba/pkg/chaos/docker"
 )
 
 type killContext struct {

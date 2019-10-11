@@ -6,8 +6,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/alexei-led/pumba/pkg/chaos"
-	"github.com/alexei-led/pumba/pkg/container"
+	"github.com/shinespb/pumba/pkg/chaos"
+	"github.com/shinespb/pumba/pkg/container"
 	"github.com/stretchr/testify/mock"
 )
 

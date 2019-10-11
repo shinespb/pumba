@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/alexei-led/pumba/pkg/chaos"
+	"github.com/shinespb/pumba/pkg/chaos"
 )
 
 func TestMockChaosCommand(t *testing.T) {

@@ -6,8 +6,8 @@ import (
 
 	"github.com/urfave/cli"
 
-	"github.com/alexei-led/pumba/pkg/chaos"
-	"github.com/alexei-led/pumba/pkg/chaos/netem"
+	"github.com/shinespb/pumba/pkg/chaos"
+	"github.com/shinespb/pumba/pkg/chaos/netem"
 )
 
 type delayContext struct {
@@ -63,6 +63,8 @@ func (cmd *delayContext) delay(c *cli.Context) error {
 	iface := c.Parent().String("interface")
 	// get ips list from parent `netem`` command `target` flag
 	ips := c.Parent().StringSlice("target")
+	// get port from parent `netem`` command `target` flag
+	port := uint16(c.Parent().Uint64("port"))
 	// get duration from parent `netem`` command
 	duration := c.Parent().String("duration")
 	// get traffic control image from parent `netem` command
@@ -82,7 +84,7 @@ func (cmd *delayContext) delay(c *cli.Context) error {
 	distribution := c.String("distribution")
 
 	// init netem delay command
-	delayCommand, err := netem.NewDelayCommand(chaos.DockerClient, names, pattern, iface, ips, duration, interval, time, jitter, correlation, distribution, image, pull, limit, dryRun)
+	delayCommand, err := netem.NewDelayCommand(chaos.DockerClient, names, pattern, iface, ips, port, duration, interval, time, jitter, correlation, distribution, image, pull, limit, dryRun)
 	if err != nil {
 		return err
 	}

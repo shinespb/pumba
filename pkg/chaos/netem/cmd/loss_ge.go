@@ -6,8 +6,8 @@ import (
 
 	"github.com/urfave/cli"
 
-	"github.com/alexei-led/pumba/pkg/chaos"
-	"github.com/alexei-led/pumba/pkg/chaos/netem"
+	"github.com/shinespb/pumba/pkg/chaos"
+	"github.com/shinespb/pumba/pkg/chaos/netem"
 )
 
 type lossGEContext struct {
@@ -64,6 +64,8 @@ func (cmd *lossGEContext) lossGE(c *cli.Context) error {
 	iface := c.Parent().String("interface")
 	// get ips list from parent `netem`` command `target` flag
 	ips := c.Parent().StringSlice("target")
+	// get port from parent `netem`` command `target` flag
+	port := uint16(c.Parent().Uint64("port"))
 	// get duration from parent `netem`` command
 	duration := c.Parent().String("duration")
 	// get traffic control image from parent `netem` command
@@ -83,7 +85,7 @@ func (cmd *lossGEContext) lossGE(c *cli.Context) error {
 	oneK := c.Float64("one-k")
 
 	// init netem loss gemodel command
-	lossGECommand, err := netem.NewLossGECommand(chaos.DockerClient, names, pattern, iface, ips, duration, interval, pg, pb, oneH, oneK, image, pull, limit, dryRun)
+	lossGECommand, err := netem.NewLossGECommand(chaos.DockerClient, names, pattern, iface, ips, port, duration, interval, pg, pb, oneH, oneK, image, pull, limit, dryRun)
 	if err != nil {
 		return err
 	}

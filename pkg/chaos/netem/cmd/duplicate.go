@@ -6,8 +6,8 @@ import (
 
 	"github.com/urfave/cli"
 
-	"github.com/alexei-led/pumba/pkg/chaos"
-	"github.com/alexei-led/pumba/pkg/chaos/netem"
+	"github.com/shinespb/pumba/pkg/chaos"
+	"github.com/shinespb/pumba/pkg/chaos/netem"
 )
 
 type duplicateContext struct {
@@ -53,6 +53,8 @@ func (cmd *duplicateContext) duplicate(c *cli.Context) error {
 	iface := c.Parent().String("interface")
 	// get ips list from parent `netem`` command `target` flag
 	ips := c.Parent().StringSlice("target")
+	// get port from parent `netem`` command `target` flag
+	port := uint16(c.Parent().Uint64("port"))
 	// get duration from parent `netem`` command
 	duration := c.Parent().String("duration")
 	// get traffic control image from parent `netem` command
@@ -68,7 +70,7 @@ func (cmd *duplicateContext) duplicate(c *cli.Context) error {
 	correlation := c.Float64("correlation")
 
 	// init netem duplicate command
-	duplicateCommand, err := netem.NewDuplicateCommand(chaos.DockerClient, names, pattern, iface, ips, duration, interval, percent, correlation, image, pull, limit, dryRun)
+	duplicateCommand, err := netem.NewDuplicateCommand(chaos.DockerClient, names, pattern, iface, ips, port, duration, interval, percent, correlation, image, pull, limit, dryRun)
 	if err != nil {
 		return err
 	}

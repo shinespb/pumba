@@ -12,11 +12,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/alexei-led/pumba/pkg/chaos"
-	"github.com/alexei-led/pumba/pkg/chaos/docker/cmd"
-	netemCmd "github.com/alexei-led/pumba/pkg/chaos/netem/cmd"
-	"github.com/alexei-led/pumba/pkg/container"
-	"github.com/alexei-led/pumba/pkg/logger"
+	"github.com/shinespb/pumba/pkg/chaos"
+	"github.com/shinespb/pumba/pkg/chaos/docker/cmd"
+	netemCmd "github.com/shinespb/pumba/pkg/chaos/netem/cmd"
+	"github.com/shinespb/pumba/pkg/container"
+	"github.com/shinespb/pumba/pkg/logger"
 
 	log "github.com/sirupsen/logrus"
 
@@ -85,6 +85,10 @@ func main() {
 		{
 			Name:  "Alexei Ledenev",
 			Email: "alexei.led@gmail.com",
+		},
+		{
+			Name: "Igor Shestakov",
+			Email: "shinespb@gmail.com",
 		},
 	}
 	app.EnableBashCompletion = true
@@ -298,6 +302,10 @@ func initializeCLICommands() []cli.Command {
 				cli.StringSliceFlag{
 					Name:  "target, t",
 					Usage: "target IP filter; supports multiple IPs; supports CIDR notation",
+				},
+				cli.StringFlag{
+					Name:  "port, p",
+					Usage: "target port filter",
 				},
 				cli.StringFlag{
 					Name:  "tc-image",

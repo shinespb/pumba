@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/alexei-led/pumba/pkg/container"
-	"github.com/alexei-led/pumba/pkg/util"
+	"github.com/shinespb/pumba/pkg/container"
+	"github.com/shinespb/pumba/pkg/util"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"

@@ -5,24 +5,25 @@ import (
 	"net"
 	"time"
 
-	"github.com/alexei-led/pumba/pkg/container"
+	"github.com/shinespb/pumba/pkg/container"
 	log "github.com/sirupsen/logrus"
 )
 
 // run network emulation command, stop netem on timeout or abort
-func runNetem(ctx context.Context, client container.Client, container container.Container, netInterface string, cmd []string, ips []*net.IPNet, duration time.Duration, tcimage string, pull bool, dryRun bool) error {
+func runNetem(ctx context.Context, client container.Client, container container.Container, netInterface string, cmd []string, ips []*net.IPNet, port uint16, duration time.Duration, tcimage string, pull bool, dryRun bool) error {
 	log.WithFields(log.Fields{
 		"id":       container.ID(),
 		"name":     container.Name(),
 		"iface":    netInterface,
 		"netem":    cmd,
 		"ips":      ips,
+		"port":		port,
 		"duration": duration,
 		"tc-image": tcimage,
 		"pull":     pull,
 	}).Debug("running netem command")
 	var err error
-	err = client.NetemContainer(ctx, container, netInterface, cmd, ips, duration, tcimage, pull, dryRun)
+	err = client.NetemContainer(ctx, container, netInterface, cmd, ips, port, duration, tcimage, pull, dryRun)
 	if err != nil {
 		log.WithError(err).Error("failed to start netem for container")
 		return err
@@ -39,20 +40,22 @@ func runNetem(ctx context.Context, client container.Client, container container.
 			"name":     container.Name(),
 			"iface":    netInterface,
 			"ips":      ips,
+			"port":		port,
 			"tc-image": tcimage,
 		}).Debug("stopping netem command on abort")
 		// use different context to stop netem since parent context is canceled
-		err = client.StopNetemContainer(context.Background(), container, netInterface, ips, tcimage, pull, dryRun)
+		err = client.StopNetemContainer(context.Background(), container, netInterface, ips, port, tcimage, pull, dryRun)
 	case <-stopCtx.Done():
 		log.WithFields(log.Fields{
 			"id":       container.ID(),
 			"name":     container.Name(),
 			"iface":    netInterface,
 			"ips":      ips,
+			"port":		port,
 			"tc-image": tcimage,
 		}).Debug("stopping netem command on timout")
 		// use parent context to stop netem in container
-		err = client.StopNetemContainer(context.Background(), container, netInterface, ips, tcimage, pull, dryRun)
+		err = client.StopNetemContainer(context.Background(), container, netInterface, ips, port, tcimage, pull, dryRun)
 	}
 	return err
 }

@@ -10,9 +10,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/alexei-led/pumba/pkg/chaos"
-	"github.com/alexei-led/pumba/pkg/container"
-	"github.com/alexei-led/pumba/pkg/util"
+	"github.com/shinespb/pumba/pkg/chaos"
+	"github.com/shinespb/pumba/pkg/container"
+	"github.com/shinespb/pumba/pkg/util"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -36,6 +36,7 @@ type RateCommand struct {
 	pattern        string
 	iface          string
 	ips            []*net.IPNet
+	port           uint16
 	duration       time.Duration
 	rate           string
 	packetOverhead int
@@ -53,6 +54,7 @@ func NewRateCommand(client container.Client,
 	pattern string, // re2 regex pattern
 	iface string, // network interface
 	ipsList []string, // list of target ips
+	port    uint16,
 	durationStr string, // chaos duration
 	intervalStr string, // repeatable chaos interval
 	rate string, // delay outgoing packets; in common units
@@ -124,6 +126,7 @@ func NewRateCommand(client container.Client,
 		pattern:        pattern,
 		iface:          iface,
 		ips:            ips,
+		port:           port,
 		duration:       duration,
 		rate:           rate,
 		packetOverhead: packetOverhead,
@@ -188,7 +191,7 @@ func (n *RateCommand) Run(ctx context.Context, random bool) error {
 		wg.Add(1)
 		go func(i int, c container.Container) {
 			defer wg.Done()
-			errors[i] = runNetem(netemCtx, n.client, c, n.iface, netemCmd, n.ips, n.duration, n.image, n.pull, n.dryRun)
+			errors[i] = runNetem(netemCtx, n.client, c, n.iface, netemCmd, n.ips, n.port, n.duration, n.image, n.pull, n.dryRun)
 			if errors[i] != nil {
 				log.WithError(errors[i]).Error("failed to set network rate for container")
 			}
