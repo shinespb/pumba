@@ -450,8 +450,10 @@ func (client dockerClient) startNetemContainerIPFilter(ctx context.Context, c Co
 					"u32", "match", "ip", "dst", ip.String(), "flowid", "1:3"}
 			} else {
 				log.WithField("netem", " port ").Debug("adding netem filter - port defined")
+				// filter selected port for all protocols
+				// 0xffff means - all protocols
 				filterCommand = []string{"filter", "add", "dev", netInterface, "protocol", "ip", "parent", "1:0", "prio", "1",
-					"u32", "match", "ip", "dst", ip.String(), "dport", string(port), "flowid", "1:3"}
+					"u32", "match", "ip", "dst", ip.String(), "dport", string(port), "0xffff", "flowid", "1:3"}
 
 			}
 			log.WithField("netem", strings.Join(filterCommand, " ")).Debug("adding netem filter")
