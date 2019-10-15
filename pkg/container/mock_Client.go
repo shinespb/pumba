@@ -73,12 +73,12 @@ func (_m *MockClient) ListContainers(_a0 context.Context, _a1 Filter) ([]Contain
 }
 
 // NetemContainer provides a mock function with given fields: _a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8
-func (_m *MockClient) NetemContainer(_a0 context.Context, _a1 Container, _a2 string, _a3 []string, _a4 []*net.IPNet, _a5 time.Duration, _a6 string, _a7 bool, _a8 bool) error {
-	ret := _m.Called(_a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8)
+func (_m *MockClient) NetemContainer(_a0 context.Context, _a1 Container, _a2 string, _a3 []string, _a4 []*net.IPNet, _a5 uint16 , _a6 time.Duration, _a7 string, _a8 bool, _a9 bool) error {
+	ret := _m.Called(_a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, Container, string, []string, []*net.IPNet, time.Duration, string, bool, bool) error); ok {
-		r0 = rf(_a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8)
+	if rf, ok := ret.Get(0).(func(context.Context, Container, string, []string, []*net.IPNet, uint16, time.Duration, string, bool, bool) error); ok {
+		r0 = rf(_a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7, _a8, _a9)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -143,12 +143,12 @@ func (_m *MockClient) StopContainer(_a0 context.Context, _a1 Container, _a2 int,
 }
 
 // StopNetemContainer provides a mock function with given fields: _a0, _a1, _a2, _a3, _a4, _a5, _a6
-func (_m *MockClient) StopNetemContainer(_a0 context.Context, _a1 Container, _a2 string, _a3 []*net.IPNet, _a4 string, _a5 bool, _a6 bool) error {
-	ret := _m.Called(_a0, _a1, _a2, _a3, _a4, _a5, _a6)
+func (_m *MockClient) StopNetemContainer(_a0 context.Context, _a1 Container, _a2 string, _a3 []*net.IPNet, _a4 uint16, _a5 string, _a6 bool, _a7 bool) error {
+	ret := _m.Called(_a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, Container, string, []*net.IPNet, string, bool, bool) error); ok {
-		r0 = rf(_a0, _a1, _a2, _a3, _a4, _a5, _a6)
+	if rf, ok := ret.Get(0).(func(context.Context, Container, string, []*net.IPNet, uint16, string, bool, bool) error); ok {
+		r0 = rf(_a0, _a1, _a2, _a3, _a4, _a5, _a6, _a7)
 	} else {
 		r0 = ret.Error(0)
 	}
