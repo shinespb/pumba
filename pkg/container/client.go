@@ -444,7 +444,7 @@ func (client dockerClient) startNetemContainerIPFilter(ctx context.Context, c Co
 		// See more: http://man7.org/linux/man-pages/man8/tc-netem.8.html
 		for _, ip := range ips {
 			var filterCommand []string
-			if port != 0 {
+			if port == 0 {
 				log.WithField("netem", " noport ").Debug("adding netem filter - no port defined")
 				filterCommand = []string{"filter", "add", "dev", netInterface, "protocol", "ip", "parent", "1:0", "prio", "1",
 					"u32", "match", "ip", "dst", ip.String(), "flowid", "1:3"}
